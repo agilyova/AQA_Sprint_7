@@ -3,35 +3,43 @@ package ru.yandex.practicum;
 import io.qameta.allure.Issue;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import ru.yandex.practicum.objects.Courier;
 import ru.yandex.practicum.steps.CourierSteps;
 
+import static ru.yandex.practicum.helpers.DataGeneratorHelper.getLogin;
+import static ru.yandex.practicum.helpers.DataGeneratorHelper.getPassword;
+
 @DisplayName("Логин курьера")
 public class CourierLoginTest extends BaseTest {
-  CourierSteps steps = new CourierSteps();
-  String existedLogin = "gilyova";
-  String existedPassword = "123456";
-  int existedCourierId = 371520;
-  String notExistedLogin = "gilyova!2638742%?№;?";
-  String wrongPassword = "123";
+  static CourierSteps steps = new CourierSteps();
+  static Courier existedCourier;
+  static String login = getLogin();
+  static String password = getPassword();
+
+  String notExistedLogin = getLogin();
+  String wrongPassword = getPassword();
   String emptyPassword = "";
 
+  @BeforeClass
+  public static void createCourier() {
+    existedCourier = new Courier(login, password);
+    steps.sendPostRequestCreateCourier(existedCourier);
+  }
 
   @DisplayName("Авторизация курьера под валидными логином/паролем возвращает id курьера")
   @Test
   public void loginCourierCorrectCredentialsReturnCourierId() {
-    Courier courier = new Courier(existedLogin, existedPassword);
+    Response response = steps.sendPostRequestLoginCourier(existedCourier);
+    int existedCourierId = steps.getCourierId(response);
 
-    Response response = steps.sendPostRequestLoginCourier(courier);
     steps.compareResponseCodeAndIdKey(response, 200, existedCourierId);
   }
 
   @DisplayName("Авторизация курьера под существующим логином и некорректным паролем возращает ошибку")
   @Test
   public void loginCourierWrongPasswordReturnError() {
-    Courier courier = new Courier(existedLogin, wrongPassword);
+    Courier courier = new Courier(login, wrongPassword);
 
     Response response = steps.sendPostRequestLoginCourier(courier);
     steps.compareResponseCodeAndMessageToExpectedValues(response, 404, "Учетная запись не найдена");
@@ -40,7 +48,7 @@ public class CourierLoginTest extends BaseTest {
   @DisplayName("Авторизация курьера под несуществующим логином возращает ошибку")
   @Test
   public void loginCourierWrongLoginReturnError() {
-    Courier courier = new Courier(notExistedLogin, existedPassword);
+    Courier courier = new Courier(notExistedLogin, password);
 
     Response response = steps.sendPostRequestLoginCourier(courier);
     steps.compareResponseCodeAndMessageToExpectedValues(response, 404, "Учетная запись не найдена");
@@ -52,7 +60,7 @@ public class CourierLoginTest extends BaseTest {
   @Test
   public void loginCourierWithOutPasswordReturnError() {
     Courier courier = new Courier();
-    courier.setLogin(existedLogin);
+    courier.setLogin(login);
 
     Response response = steps.sendPostRequestLoginCourier(courier);
     steps.compareResponseCodeAndMessageToExpectedValues(response, 400, "Недостаточно данных для входа");
@@ -61,9 +69,14 @@ public class CourierLoginTest extends BaseTest {
   @DisplayName("Авторизация курьера c пустым паролем возращает ошибку")
   @Test
   public void loginCourierWithEmptyPasswordReturnError() {
-    Courier courier = new Courier(existedLogin, emptyPassword);
+    Courier courier = new Courier(login, emptyPassword);
 
     Response response = steps.sendPostRequestLoginCourier(courier);
     steps.compareResponseCodeAndMessageToExpectedValues(response, 400, "Недостаточно данных для входа");
+  }
+
+  @AfterClass
+  public static void deleteCourier() {
+    steps.deleteCourier(existedCourier);
   }
 }

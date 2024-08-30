@@ -90,7 +90,7 @@ public class OrderSteps extends BaseSteps {
   }
 
   @Step("Получение трек-номера после создания заказа")
-  private int getTrackNumber(Response orderCreateResponse) {
+  public int getTrackNumber(Response orderCreateResponse) {
     return orderCreateResponse.
       then().
       extract().
@@ -116,7 +116,6 @@ public class OrderSteps extends BaseSteps {
     return map;
   }
 
-
   @Step("Проверка, что ответ содержит ключ track")
   public void checkResponseBodyContainTrackValue(Response response) {
     response.
@@ -130,7 +129,7 @@ public class OrderSteps extends BaseSteps {
     return response.then().extract().jsonPath().getObject("order", Order.class);
   }
 
-  @Step("Проверка, что содержимое заказа ковпадает")
+  @Step("Проверка, что содержимое заказа совпадает")
   public void compareOrders(Order existedOrder, Order orderFromResponse) {
     assertTrue(existedOrder.equals(orderFromResponse));
   }

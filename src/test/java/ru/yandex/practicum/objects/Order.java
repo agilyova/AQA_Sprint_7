@@ -146,7 +146,7 @@ public class Order {
     if (this == obj) return true;
     if (obj == null || getClass() != obj.getClass()) return false;
     Order order = (Order) obj;
-    return id == order.id &&
+    return
       firstName.equals(order.firstName) &&
       lastName.equals(order.lastName) &&
       track == order.track;

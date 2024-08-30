@@ -64,7 +64,7 @@ public class CourierSteps extends BaseSteps {
     return getCourierId(response);
   }
 
-  @Step("Удаление курьера")
+  @Step("Удаление курьера, когда id курьера не известен")
   public void deleteCourier(Courier courier) {
     Response loginResponse = sendPostRequestLoginCourier(courier);
     int courierId = getCourierId(loginResponse);
@@ -72,4 +72,9 @@ public class CourierSteps extends BaseSteps {
     compareResponseCodeAndOkValue(deleteResponse, 200, true);
   }
 
+  @Step("Удаление курьера по id")
+  public void deleteCourier(int courierId) {
+    Response deleteResponse = sendDeleteRequestDeleteCourier(courierId);
+    compareResponseCodeAndOkValue(deleteResponse, 200, true);
+  }
 }

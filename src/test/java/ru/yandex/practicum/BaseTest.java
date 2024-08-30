@@ -1,12 +1,12 @@
 package ru.yandex.practicum;
 
 import io.restassured.RestAssured;
-import org.junit.Before;
+import org.junit.BeforeClass;
 
 public class BaseTest {
 
-  @Before
-  public void setUp() {
+  @BeforeClass
+  public static void setUp() {
     RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru";
   }
 }
